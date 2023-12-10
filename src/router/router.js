@@ -4,8 +4,8 @@ import HomePage from '../views/homePage/HomePage.vue'
 import StudentManagement from '../views/teachAchievement/student/StudentManagement.vue'
 import CourseManagement from '../views/teachAchievement/course/CourseManagement.vue'
 import CollSignIn from '../views/attendanceManagement/CollSignIn.vue'
-import Register from '../views/register_login/Register.vue'
-import Login from '../views/register_login/Login.vue'
+import Register from '../views/registerAndLogin/Register.vue'
+import Login from '../views/registerAndLogin/Login.vue'
 
 const router = createRouter({
     history: createWebHistory(),

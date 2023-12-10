@@ -63,10 +63,15 @@ export default {
         })
     },
 
+    /**
+     * 在考勤记录表中根据修改状态来标为签到或缺勤
+     * @param {*} updateState 
+     * @returns 
+     */
     updateStateByConditions: (updateState) => {
         return axios({
             method: "GET",
-            url: `${baseURL}/updateStateByConditions?state=${updateState.state}&grade=${updateState.grade}&college=${updateState.college}&major=${updateState.major}&course=${updateState.course}&classes=${updateState.classes}&studentId=${updateState.studentId}&studentName=${updateState.studentName}&createTime=${updateState.createTime}`
+            url: `${baseURL}/updateStateByConditions?state=${updateState.state}&id=${updateState.id}&createTime=${updateState.createTime}`
         })
     }
 }

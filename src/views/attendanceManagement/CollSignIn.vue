@@ -1,8 +1,8 @@
 <template>
   <div class="ml-10">
     <!-- 签到信息栏 -->
-    <div class="mt-5 bg-white">
-      <div class="p-5">
+    <div class=" bg-white">
+      <div class="p-7">
         <el-button
           name="notSignIn"
           @click="notSignInChange"
@@ -28,8 +28,8 @@
           >缺勤</el-button
         >
       </div>
-      <div class="w-320">
-        <el-table :data="pageList.pageData" stripe class="border-2 hover:shadow-md">
+      <div class="w-320 mt-1">
+        <el-table :data="pageList.pageData" stripe class="border-1 hover:shadow-md">
           <el-table-column prop="grade" sortable label="年级" align="center" />
           <el-table-column prop="college" label="学院" align="center" />
           <el-table-column prop="major" label="专业" align="center" />
@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import AttendanceManagementApi from "../../api/mothod/AttendanceManagement";
+import attendanceManagementApi from "../../api/mothod/AttendanceManagement";
 import { Check, Close, Warning } from "@element-plus/icons-vue";
 import { useUserStore } from "../../store/userStore";
 import formateTime from "../../utils/formateTime";
@@ -137,7 +137,7 @@ const courseList = ref({
 
 //获取所有课程，用当前时间，星期数与所有课程的时间，星期数作比较
 const findAll = async () => {
-  const { data } = await AttendanceManagementApi.findAll(userStore.users.teacherId);
+  const { data } = await attendanceManagementApi.findAll(userStore.users.teacherId);
 
   if (data.code === 200) {
     data.data.forEach((item, index) => {
@@ -179,7 +179,7 @@ const findAll = async () => {
 
 //未签到
 const notSignInChange = async () => {
-  const { data } = await AttendanceManagementApi.findNotSignInBYConditions({
+  const { data } = await attendanceManagementApi.findNotSignInBYConditions({
     teacherId: userStore.users.teacherId,
     grade: courseList.value.grade,
     college: courseList.value.college,
@@ -201,7 +201,7 @@ const notSignInChange = async () => {
 
 //签到
 const signInChange = async() => {
-  const { data } = await AttendanceManagementApi.findSignInOrAbsenceByConditions({
+  const { data } = await attendanceManagementApi.findSignInOrAbsenceByConditions({
     teacherId: userStore.users.teacherId,
     grade: courseList.value.grade,
     college: courseList.value.college,
@@ -224,7 +224,7 @@ const signInChange = async() => {
 
 //缺勤
 const absenceChange = async () => {
-  const { data } = await AttendanceManagementApi.findSignInOrAbsenceByConditions({
+  const { data } = await attendanceManagementApi.findSignInOrAbsenceByConditions({
     teacherId: userStore.users.teacherId,
     grade: courseList.value.grade,
     college: courseList.value.college,
@@ -253,7 +253,7 @@ const notSinInToSignIn = async (row) => {
   ).toISOString();
   // console.log(date);
 
-  const { data } = await AttendanceManagementApi.notSinInToSignInSave({
+  const { data } = await attendanceManagementApi.notSinInToSignInSave({
     teacherId: userStore.users.teacherId,
     grade: row.grade,
     college: row.college,
@@ -283,7 +283,7 @@ const notSignInToAbsence = async (row) => {
   ).toISOString();
   // console.log(date);
 
-  const { data } = await AttendanceManagementApi.notSinInToSignInSave({
+  const { data } = await attendanceManagementApi.notSinInToSignInSave({
     teacherId: userStore.users.teacherId,
     grade: row.grade,
     college: row.college,
@@ -307,7 +307,7 @@ const notSignInToAbsence = async (row) => {
 
 //签到 => 未签到
 const signInToNotSignIn = async (row) => {
-  const { data } = await AttendanceManagementApi.deleteSignInToNotSignInByConditions({
+  const { data } = await attendanceManagementApi.deleteSignInToNotSignInByConditions({
     grade: row.grade,
     college: row.college,
     major: row.major,
@@ -328,15 +328,10 @@ const signInToNotSignIn = async (row) => {
 
 //签到 => 缺勤
 const signInToAbsence = async (row) => {
-  const { data } = await AttendanceManagementApi.updateStateByConditions({
+  const { data } = await attendanceManagementApi.updateStateByConditions({
     state: 0,
     grade: row.grade,
-    college: row.college,
-    major: row.major,
-    course: courseList.value.course,
-    classes: row.classes,
-    studentId: row.studentId,
-    studentName: row.studentName,
+    id: row.id,
     createTime: formateDate(new Date()),
   });
 
@@ -350,15 +345,9 @@ const signInToAbsence = async (row) => {
 
 //缺勤 => 签到
 const absenceToSignIn = async (row) => {
-  const { data } = await AttendanceManagementApi.updateStateByConditions({
+  const { data } = await attendanceManagementApi.updateStateByConditions({
     state: 1,
-    grade: row.grade,
-    college: row.college,
-    major: row.major,
-    course: courseList.value.course,
-    classes: row.classes,
-    studentId: row.studentId,
-    studentName: row.studentName,
+    id: row.id,
     createTime: formateDate(new Date()),
   });
 
@@ -372,7 +361,7 @@ const absenceToSignIn = async (row) => {
 
 //缺勤 => 未签到
 const absenceToNotSignIn = async (row) => {
-  const { data } = await AttendanceManagementApi.deleteSignInToNotSignInByConditions({
+  const { data } = await attendanceManagementApi.deleteSignInToNotSignInByConditions({
     grade: row.grade,
     college: row.college,
     major: row.major,
