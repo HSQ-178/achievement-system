@@ -71,7 +71,7 @@ const teachList = ref([
 //考勤管理信息
 const attendanceList = ref([
   { index: "3-1", title: "点名签到", path: "/collSignIn" },
-  { index: "3-2", title: "位置签到", path: "" },
+  { index: "3-2", title: "位置签到", path: "/addressSignIn" },
   { index: "3-3", title: "拍照签到", path: "" },
   { index: "3-4", title: "二维码签到", path: "" },
 ]);

@@ -4,6 +4,7 @@ import HomePage from '../views/homePage/HomePage.vue'
 import StudentManagement from '../views/teachAchievement/student/StudentManagement.vue'
 import CourseManagement from '../views/teachAchievement/course/CourseManagement.vue'
 import CollSignIn from '../views/attendanceManagement/CollSignIn.vue'
+import AddressSignIn from '../views/attendanceManagement/AddressSignIn.vue'
 import Register from '../views/registerAndLogin/Register.vue'
 import Login from '../views/registerAndLogin/Login.vue'
 
@@ -17,7 +18,8 @@ const router = createRouter({
                 { path: '/homePage', component: HomePage },
                 { path: '/studentManagement', component: StudentManagement },
                 { path: '/courseManagement', component: CourseManagement },
-                { path: '/collSignIn', component: CollSignIn }
+                { path: '/collSignIn', component: CollSignIn },
+                { path: '/addressSignIn', component: AddressSignIn }
             ]
         },
         {

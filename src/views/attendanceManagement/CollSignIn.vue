@@ -123,17 +123,15 @@ import { ElMessage } from "element-plus";
 
 const userStore = useUserStore();
 
-const tableList = ref([]); //表格切换数据
-const name = ref(""); //按钮切换显示不同的按钮
-
-//存储当前的课程信息
-const courseList = ref({
+const tableData = ref({
   grade: "",
   college: "",
   major: "",
   course: "",
-  startTime: "",
-});
+  startTime: ""
+})
+const tableList = ref([]); //表格切换数据
+const name = ref(""); //按钮切换显示不同的按钮
 
 //获取所有课程，用当前时间，星期数与所有课程的时间，星期数作比较
 const findAll = async () => {
@@ -145,31 +143,23 @@ const findAll = async () => {
       const startTime = formateTime(new Date(item.startTime));
       const endTime = formateTime(new Date(item.endTime));
       const courseWeek = new Date(item.startTime).getDay(); //获取星期数
-      const courseYear = new Date(item.startTime).getFullYear(); //获取年份
+      const courseYear = new Date(item.startTime).getFullYear()
 
       //获取当前时间, 将当前时间格式化为"hh:mm:ss"
       const dateTime = formateTime(new Date());
       const dateWeek = new Date().getDay(); //获取当前星期数
-      const dateYear = new Date().getFullYear(); //获取当前年份
+      const dateYear = new Date().getFullYear()
 
       //判断
-      if (courseYear === dateYear) {
+      if(courseYear === dateYear) {
         if (courseWeek === dateWeek) {
           if (startTime <= dateTime && dateTime <= endTime) {
-            courseList.value.grade = item.grade;
-            courseList.value.college = item.college;
-            courseList.value.major = item.major;
-            courseList.value.course = item.course;
-            courseList.value.startTime = item.startTime;
+            tableData.value.grade = item.grade
+            tableData.value.college = item.college
+            tableData.value.major = item.major
+            tableData.value.course = item.course
+            tableData.value.startTime = item.startTime
             console.log(`现在${item.course}课`);
-          }else {
-            courseList.value.grade = ""
-            courseList.value.college = ""
-            courseList.value.major = ""
-            courseList.value.course = ""
-            courseList.value.startTime = ""
-
-            ElMessage.info("现在没有课")
           }
         }
       }
@@ -181,13 +171,12 @@ const findAll = async () => {
 const notSignInChange = async () => {
   const { data } = await attendanceManagementApi.findNotSignInBYConditions({
     teacherId: userStore.users.teacherId,
-    grade: courseList.value.grade,
-    college: courseList.value.college,
-    major: courseList.value.major,
-    course: courseList.value.course,
+    grade: tableData.value.grade,
+    college: tableData.value.college,
+    major: tableData.value.major,
+    course: tableData.value.course,
     createTime: formateDate(new Date()),
   });
-  // console.log(data.data);
 
   if (data.code === 200) {
     tableList.value = data.data;
@@ -203,10 +192,10 @@ const notSignInChange = async () => {
 const signInChange = async() => {
   const { data } = await attendanceManagementApi.findSignInOrAbsenceByConditions({
     teacherId: userStore.users.teacherId,
-    grade: courseList.value.grade,
-    college: courseList.value.college,
-    major: courseList.value.major,
-    course: courseList.value.course,
+    grade: tableData.value.grade,
+    college: tableData.value.college,
+    major: tableData.value.major,
+    course: tableData.value.course,
     createTime: formateDate(new Date()),
     state: 1,
   });
@@ -226,10 +215,10 @@ const signInChange = async() => {
 const absenceChange = async () => {
   const { data } = await attendanceManagementApi.findSignInOrAbsenceByConditions({
     teacherId: userStore.users.teacherId,
-    grade: courseList.value.grade,
-    college: courseList.value.college,
-    major: courseList.value.major,
-    course: courseList.value.course,
+    grade: tableData.value.grade,
+    college: tableData.value.college,
+    major: tableData.value.major,
+    course: tableData.value.course,
     createTime: formateDate(new Date()),
     state: 0,
   });
@@ -249,16 +238,16 @@ const absenceChange = async () => {
 const notSinInToSignIn = async (row) => {
   //当前日期与上课时间进行拼接
   const date = new Date(
-    formateDate(new Date()) + " " + formateTime(new Date(courseList.value.startTime))
+    formateDate(new Date()) + " " + formateTime(new Date(tableData.value.startTime))
   ).toISOString();
-  // console.log(date);
+  
 
   const { data } = await attendanceManagementApi.notSinInToSignInSave({
     teacherId: userStore.users.teacherId,
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: courseList.value.course,
+    course: tableData.value.course,
     classes: row.classes,
     studentId: row.studentId,
     studentName: row.studentName,
@@ -279,7 +268,7 @@ const notSinInToSignIn = async (row) => {
 const notSignInToAbsence = async (row) => {
   //当前日期与上课时间进行拼接
   const date = new Date(
-    formateDate(new Date()) + " " + formateTime(new Date(courseList.value.startTime))
+    formateDate(new Date()) + " " + formateTime(new Date(tableData.value.startTime))
   ).toISOString();
   // console.log(date);
 
@@ -288,7 +277,7 @@ const notSignInToAbsence = async (row) => {
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: courseList.value.course,
+    course: tableData.value.course,
     classes: row.classes,
     studentId: row.studentId,
     studentName: row.studentName,
@@ -311,7 +300,7 @@ const signInToNotSignIn = async (row) => {
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: courseList.value.course,
+    course: tableData.value.course,
     classes: row.classes,
     studentId: row.studentId,
     studentName: row.studentName,
@@ -328,6 +317,7 @@ const signInToNotSignIn = async (row) => {
 
 //签到 => 缺勤
 const signInToAbsence = async (row) => {
+  console.log(row);
   const { data } = await attendanceManagementApi.updateStateByConditions({
     state: 0,
     grade: row.grade,
@@ -365,7 +355,7 @@ const absenceToNotSignIn = async (row) => {
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: courseList.value.course,
+    course: tableData.value.course,
     classes: row.classes,
     studentId: row.studentId,
     studentName: row.studentName,
@@ -416,7 +406,7 @@ const handleCurrentChange = (val) => {
 
 //侦听
 watch(
-  () => courseList.value,
+  () => tableData.value,
   (newCourseList) => {
     notSignInChange(newCourseList),
       signInChange(newCourseList),
