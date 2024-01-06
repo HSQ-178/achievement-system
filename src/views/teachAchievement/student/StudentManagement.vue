@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-10">
+  <div>
     <!-- 查询栏 -->
     <div class="pl-20 h-40 bg-white border-2">
       <el-form class="grid grid-cols-3 mt-4">
@@ -33,14 +33,14 @@
         </el-form-item>
         <el-form-item label="学号：">
           <el-input
-            class="w-60%"
+            class="w-52%"
             v-model="searchList.studentId"
             placeholder="请输入学号"
           ></el-input>
         </el-form-item>
         <el-form-item label="姓名：">
           <el-input
-            class="w-60%"
+            class="w-52%"
             v-model="searchList.studentName"
             placeholder="请输入姓名"
           ></el-input>
@@ -58,8 +58,8 @@
     </div>
 
     <!-- 表单栏 -->
-    <div class="w-320 mt-5">
-      <el-table stripe :data="pageList.pageData" class="border-2 shadow-sm hover:shadow-md">
+    <div class="mt-5">
+      <el-table stripe :data="pageList.tableData" class="border-2 shadow-sm hover:shadow-md">
         <el-table-column prop="grade" sortable label="年级" align="center"/>
         <el-table-column prop="college" label="学院" align="center"/>
         <el-table-column prop="major" label="专业" align="center" />
@@ -83,8 +83,8 @@
         v-model:page-size="pageList.pageSize"
         layout="prev, pager, next"
         :total="pageList.pageTotal"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        @size-change="changePageSize"
+        @current-change="changeCurrentPage"
       />
     </div>
   </div>
@@ -94,6 +94,7 @@
 import StudentsManagementApi from "../../../api/mothod/StudentsManagement";
 import { useUserStore } from "../../../store/userStore";
 import { useRecordStore } from "../../../store/recordStore";
+import { pageList, handleSizeChange, handleCurrentChange } from '../../../utils/pagination'
 import { ref, onMounted } from "vue";
 
 //搜索栏数据
@@ -109,15 +110,6 @@ const searchList = ref({
 //表格数据
 const studentList = ref([]);
 
-//分页数据
-const pageList = ref({
-  tableData: [], // 总的数据
-  pageData: [], //每页总数据
-  currentPage: 1, // 当前页 默认是第一页
-  pageSize: 14, // 每页大小 默认每页14条数据
-  pageTotal: 0, // 总数据量 默认为 0
-});
-
 const userStore = useUserStore();
 const recordStore = useRecordStore();
 
@@ -126,42 +118,26 @@ const tableListShow = async () => {
   const { data } = await StudentsManagementApi.findStudentsByTeacherIdAndTeacherName({
     teacherId: userStore.users.teacherId,
     teacherName: userStore.users.teacherName,
+    currentPage: pageList.value.currentPage,
+    pageSize: pageList.value.pageSize
   });
-  // console.log(data.data);
+  console.log(data.data.data);
   if (data.code === 200) {
-    recordStore.setStudent(data.data);
-    studentList.value = data.data;
-    pageList.value.tableData = data.data;
-    pageList.value.pageTotal = data.data.length;
-
-    pageList.value.pageData = queryByPage();
+    recordStore.setStudent(data.data.data);
+    studentList.value = data.data.data;
+    pageList.value.tableData = data.data.data;
+    pageList.value.pageTotal = data.data.totalCount;
   }
-  // console.log(pageList.value.tableData);
-  // console.log(recordStore.students);
 };
 
-function queryByPage() {
-  //起始位置：（当前页-1）×每页大小
-  let start = (pageList.value.currentPage - 1) * pageList.value.pageSize;
-  //结束位置：当前页×每页大小
-  let end = pageList.value.currentPage * pageList.value.pageSize;
-
-  //返回切割数组后的数据
-  return pageList.value.tableData.slice(start, end);
-}
-
-// 改变每页大小的方法
-const handleSizeChange = (val) => {
-  pageList.value.pageSize = val;
-
-  pageList.value.pageData = queryByPage();
+const changePageSize = (val) => {
+  handleSizeChange(val);
+  tableListShow()
 };
 
-// 改变当前页的方法
-const handleCurrentChange = (val) => {
-  pageList.value.currentPage = val;
-
-  pageList.value.pageData = queryByPage();
+const changeCurrentPage = (val) => {
+  handleCurrentChange(val);
+  tableListShow()
 };
 
 //搜索

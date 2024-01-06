@@ -22,7 +22,17 @@ export default {
     findNotSignInBYConditions: (data) => {
         return axios({
             method: "GET",
-            url: `${baseURL}/findNotSignInBYConditions?teacherId=${data.teacherId}&grade=${data.grade}&college=${data.college}&major=${data.major}&course=${data.course}&createTime=${data.createTime}`
+            url: `${baseURL}/findNotSignInBYConditions`,
+            params: {
+                teacherId: data.teacherId,
+                grade: data.grade,
+                college: data.college,
+                major: data.major,
+                course: data.course,
+                createTime: data.createTime,
+                currentPage: data.currentPage,
+                pageSize: data.pageSize
+            }
         })
     },
 
@@ -34,7 +44,18 @@ export default {
     findSignInOrAbsenceByConditions: (data) => {
         return axios({
             method: "GET",
-            url: `${baseURL}/findSignInOrAbsenceByConditions?teacherId=${data.teacherId}&grade=${data.grade}&college=${data.college}&major=${data.major}&course=${data.course}&createTime=${data.createTime}&state=${data.state}`
+            url: `${baseURL}/findSignInOrAbsenceByConditions`,
+            params: {
+                teacherId: data.teacherId,
+                grade: data.grade,
+                college: data.college,
+                major: data.major,
+                course: data.course,
+                createTime: data.createTime,
+                state: data.state,
+                currentPage: data.currentPage,
+                pageSize: data.pageSize
+            }
         })
     },
 

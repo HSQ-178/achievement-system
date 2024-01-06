@@ -1,7 +1,7 @@
 <template>
-    <div class="ml-10">
+    <div>
         <!-- 查询栏 -->
-    <div class="pl-60 w-320 h-40 bg-white border-2">
+    <div class="pl-60 h-40 bg-white border-2">
         <el-form class="grid grid-cols-2 mt-4">
           <el-form-item label="年级：">
             <el-select v-model="searchList.grade" placeholder="请选择年级" clearable>

@@ -1,11 +1,12 @@
 <template>
-  <div class="ml-10">
+  <div>
     <!-- 查询栏 -->
-    <div class="pl-60 w-320 h-45 border-2 bg-white hover:shadow-md">
+    <div class="pl-60 h-60 border-2 bg-white hover:shadow-md">
       <el-form class="grid grid-cols-2 p-5">
-        <el-form-item label="年级：">
+        <el-form-item label-width="80" label="年级：">
           <el-input
             v-model="courseStore.courses.grade"
+            disabled
             class="w-40%"
             placeholder="请输入年级"
           />
@@ -13,13 +14,15 @@
         <el-form-item label="学院：">
           <el-input
             v-model="courseStore.courses.college"
+            disabled
             class="w-40%"
             placeholder="请输入学院"
           />
         </el-form-item>
-        <el-form-item label="专业：">
+        <el-form-item label-width="80" label="专业：">
           <el-input
             v-model="courseStore.courses.major"
+            disabled
             class="w-40%"
             placeholder="请输入专业"
           />
@@ -27,17 +30,25 @@
         <el-form-item label="课程：">
           <el-input
             v-model="courseStore.courses.course"
+            disabled
             class="w-40%"
             placeholder="请输入课程"
           />
         </el-form-item>
+        <el-form-item label="设置时长：">
+          <div class="h-10 flex">
+            <el-input-number v-model="minutes" :min="1" :max="10" />
+            <p class="ml-2 mt-1 text-4 text-gray-6">分钟</p>
+          </div>
+        </el-form-item>
       </el-form>
-      <div class="absolute left-240 top-50">
+      <div class="absolute left-240 top-60">
         <el-button
           @click="releaseClick"
           class="text-white bg-indigo shadow-sm hover:bg-indigo-5 hover:text-white"
         >
           发布签到
+          <div id="countDownTime">({{ timeInSeconds }})</div>
         </el-button>
       </div>
     </div>
@@ -52,64 +63,55 @@
 <script setup>
 import { useUserStore } from "../../store/userStore";
 import { useCourseStore } from "../../store/courseStore";
-import attendanceManagementApi from "../../api/mothod/AttendanceManagement";
+import { useAddressStore } from "../../store/addressStore";
 import releaseContentApi from "../../api/mothod/ReleaseContent";
-import formateDate from "../../utils/formateDate";
-import formateTime from "../../utils/formateTime";
+import { formateDate } from "../../utils/formateDate";
+import { findAllInAddress } from "./findCourseAll";
 import * as echarts from "echarts";
 import { ref, onMounted, computed, watchEffect } from "vue";
 import { ElMessage } from "element-plus";
 
 const userStore = useUserStore();
 const courseStore = useCourseStore();
+const addressStore = useAddressStore();
 
-//获取所有课程，用当前时间，星期数与所有课程的时间，星期数作比较
-const findAll = async () => {
-  const { data } = await attendanceManagementApi.findAll(userStore.users.teacherId);
+//表单时间
+const minutes = ref(1); //设置时长
+const timeInSeconds = ref(minutes.value * 60); //将时长换算成秒
 
-  if (data.code === 200) {
-    data.data.forEach((item, index) => {
-      //将时间格式化为"hh:mm:ss"
-      const startTime = formateTime(new Date(item.startTime));
-      const endTime = formateTime(new Date(item.endTime));
-      const courseWeek = new Date(item.startTime).getDay(); //获取星期数
-      const courseYear = new Date(item.startTime).getFullYear(); //获取年份
-
-      //获取当前时间, 将当前时间格式化为"hh:mm:ss"
-      const dateTime = formateTime(new Date());
-      const dateWeek = new Date().getDay(); //获取当前星期数
-      const dateYear = new Date().getFullYear(); //获取当前年份
-
-      //判断
-      if (courseYear === dateYear) {
-        if (courseWeek === dateWeek) {
-          if (startTime <= dateTime && dateTime <= endTime) {
-            courseStore.courses.grade = item.grade;
-            courseStore.courses.college = item.college;
-            courseStore.courses.major = item.major;
-            courseStore.courses.course = item.course;
-            courseStore.courses.startTime = item.startTime;
-            console.log(`现在${item.course}课`);
-          }
-        }
-      }
-    });
-  }
-};
 
 //发布签到
 const releaseClick = async () => {
+  const currentTime = new Date(); //获取当前时间
+  currentTime.setMinutes(currentTime.getMinutes() + minutes.value); //将设置的时长加到当前时间里面
+  const formattedDateTime = currentTime.toISOString(); //后端要求的日期格式日期格式是 “yyyy-MM-dd’T’HH:mm:ss”
+
   const { data } = await releaseContentApi.saveReleaseContent({
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
     course: courseStore.courses.course,
-    content: "开始位置签到",
+    endTime: formattedDateTime,
     teacherId: userStore.users.teacherId,
   });
   // console.log(data.data);
   if (data.code === 200) {
     ElMessage.info("发布成功!");
+
+    //计时器
+    const countDownTime = document.getElementById('countDownTime');
+      let interval = setInterval(() => {
+        timeInSeconds.value--;
+        addressStore.setFormateTime({
+          minutes: minutes.value,
+          timeInSeconds: timeInSeconds.value
+        })
+        countDownTime.innerText = `(${timeInSeconds.value})`;
+        if (timeInSeconds.value === 0) {
+          countDownTime.style.display = "none";
+          clearInterval(interval);
+        }
+      }, 1000);
   } else {
     ElMessage.info("发布失败！");
   }
@@ -125,7 +127,7 @@ const attendanceCount = ref({
 //获取考勤各情况信息
 const attendanceConditions = async () => {
   //未签到情况
-  const notSignIn = await attendanceManagementApi.findNotSignInBYConditions({
+  const notSignIn = await releaseContentApi.findNotSignInBYConditions({
     teacherId: userStore.users.teacherId,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
@@ -133,11 +135,12 @@ const attendanceConditions = async () => {
     course: courseStore.courses.course,
     createTime: formateDate(new Date()),
   });
+  // console.log(notSignIn.data.data);
   if (notSignIn.data.code === 200) {
     attendanceCount.value.notSignInCount = notSignIn.data.data.length;
   }
   //签到情况
-  const signIn = await attendanceManagementApi.findSignInOrAbsenceByConditions({
+  const signIn = await releaseContentApi.findSignInOrAbsenceByConditions({
     teacherId: userStore.users.teacherId,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
@@ -151,7 +154,7 @@ const attendanceConditions = async () => {
   }
 
   //缺勤情况
-  const absence = await attendanceManagementApi.findSignInOrAbsenceByConditions({
+  const absence = await releaseContentApi.findSignInOrAbsenceByConditions({
     teacherId: userStore.users.teacherId,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
@@ -191,7 +194,7 @@ const drawPie = () => {
   newPromise.then(() => {
     //如果存在DOM，就会报存在警告，删除DOM
     echarts.dispose(document.getElementById("echarts"));
-    
+
     //创建一张饼图表
     let charts = echarts.init(document.getElementById("echarts"));
     charts.setOption({
@@ -242,13 +245,21 @@ const drawPie = () => {
   });
 };
 
+//每隔一段时间检查数据库数据的变化
+const refresh = () => {
+  setInterval(async () => {
+    await attendanceConditions();
+  }, 30000);
+};
+
 watchEffect(() => {
   drawPie(data.value.values);
 });
 
 onMounted(() => {
-  findAll();
+  findAllInAddress();
   drawPie();
   attendanceConditions();
+  refresh();
 });
 </script>

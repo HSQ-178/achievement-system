@@ -11,7 +11,13 @@ export default {
   findStudentsByTeacherIdAndTeacherName: (studentsData) => {
     return axios({
       method: "GET",
-      url: `${baseURL}/findStudentsByTeacherIdAndTeacherName?teacherId=${studentsData.teacherId}&teacherName=${studentsData.teacherName}`,
+      url: `${baseURL}/findStudentsByTeacherIdAndTeacherName`,
+      params: {
+        teacherId: studentsData.teacherId,
+        teacherName: studentsData.teacherName,
+        currentPage: studentsData.currentPage,
+        pageSize: studentsData.pageSize
+    }
     });
   },
 
