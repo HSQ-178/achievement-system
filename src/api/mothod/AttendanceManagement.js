@@ -1,6 +1,6 @@
 import axios from '../axiosApi'
 
-const baseURL = "/attendance"
+const baseURL = "/record"
 
 export default {
     /**
@@ -19,7 +19,7 @@ export default {
      * @param {Object} notSignInConditions 
      * @returns 返回未签到学生信息数组
      */
-    findNotSignInBYConditions: (data) => {
+    getNotSignInList: (data) => {
         return axios({
             method: "GET",
             url: `${baseURL}/findNotSignInBYConditions`,

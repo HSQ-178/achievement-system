@@ -71,4 +71,9 @@ export default defineConfig({
       autoInstall: true,
     }),
   ],
+  // proxy: {
+  //   '/ws': {
+  //     target: "https://apis.map.qq.com"
+  //   }
+  // }
 })

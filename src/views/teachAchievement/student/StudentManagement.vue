@@ -24,7 +24,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="班级：">
-          <el-select v-model="searchList.classes" placeholder="请选择班级" clearable>
+          <el-select v-model="searchList.class" placeholder="请选择班级" clearable>
             <el-option label="1" value="1" />
             <el-option label="2" value="2" />
             <el-option label="3" value="3" />
@@ -34,20 +34,20 @@
         <el-form-item label="学号：">
           <el-input
             class="w-52%"
-            v-model="searchList.studentId"
+            v-model="searchList.studentCard"
             placeholder="请输入学号"
           ></el-input>
         </el-form-item>
         <el-form-item label="姓名：">
           <el-input
             class="w-52%"
-            v-model="searchList.studentName"
+            v-model="searchList.name"
             placeholder="请输入姓名"
           ></el-input>
         </el-form-item>
         
       </el-form>
-      <div class="absolute right-1/2">
+      <div class="absolute right-43%">
         <el-button
           @click="searchHandle"
           class="text-white bg-indigo hover:bg-indigo-5 hover:text-white"
@@ -63,10 +63,9 @@
         <el-table-column prop="grade" sortable label="年级" align="center"/>
         <el-table-column prop="college" label="学院" align="center"/>
         <el-table-column prop="major" label="专业" align="center" />
-        <el-table-column prop="classes" sortable label="班级" align="center"/>
-        <el-table-column prop="studentId" sortable label="学号" align="center"/>
-        <el-table-column prop="studentName" label="姓名" align="center"/>
-        <el-table-column prop="studentPhone" label="手机号" align="center"/>
+        <el-table-column prop="class" sortable label="班级" align="center"/>
+        <el-table-column prop="studentCard" sortable label="学号" align="center"/>
+        <el-table-column prop="name" label="姓名" align="center"/>
         <el-table-column label="操作" align="center">
             <template #default="scope">
                 <el-button class="text-white bg-blue hover:bg-blue-5 hover:text-white" size="small">查看</el-button>
@@ -91,7 +90,7 @@
 </template>
 
 <script setup>
-import StudentsManagementApi from "../../../api/mothod/StudentsManagement";
+import StudentApi from "../../../api/mothod/student";
 import { useUserStore } from "../../../store/userStore";
 import { useRecordStore } from "../../../store/recordStore";
 import { pageList, handleSizeChange, handleCurrentChange } from '../../../utils/pagination'
@@ -99,12 +98,13 @@ import { ref, onMounted } from "vue";
 
 //搜索栏数据
 const searchList = ref({
+  id: "",
   grade: "",
   college: "",
   major: "",
-  classes: "",
-  studentId: "",
-  studentName: "",
+  class: "",
+  studentCard: "",
+  name: "",
 });
 
 //表格数据
@@ -115,17 +115,24 @@ const recordStore = useRecordStore();
 
 //将数据渲染到表格中
 const tableListShow = async () => {
-  const { data } = await StudentsManagementApi.findStudentsByTeacherIdAndTeacherName({
-    teacherId: userStore.users.teacherId,
-    teacherName: userStore.users.teacherName,
-    currentPage: pageList.value.currentPage,
-    pageSize: pageList.value.pageSize
+  const { data } = await StudentApi.getStudents({
+    teacherCard: userStore.users.teacher.teacherCard,
+    grade: searchList.value.grade,
+    college: searchList.value.college,
+    major: searchList.value.major,
+    class: searchList.value.class,
+    studentCard: searchList.value.studentCard,
+    name: searchList.value.name,
+    pagination: {
+      page: pageList.value.currentPage,
+      pageSize: pageList.value.pageSize
+    }
   });
-  console.log(data.data.data);
+  console.log(data.data);
   if (data.code === 200) {
-    recordStore.setStudent(data.data.data);
-    studentList.value = data.data.data;
-    pageList.value.tableData = data.data.data;
+    recordStore.setStudent(data.data.response);
+    studentList.value = data.data.response;
+    pageList.value.tableData = data.data.response;
     pageList.value.pageTotal = data.data.totalCount;
   }
 };
@@ -142,20 +149,20 @@ const changeCurrentPage = (val) => {
 
 //搜索
 const searchHandle = async () => {
-  const { data } = await StudentsAchievementApi.findStudentByConditions({
-    teacherId: userStore.users.teacherId,
+  const { data } = await StudentApi.getStudents({
+    teacherCard: userStore.users.teacherCard,
     grade: searchList.value.grade,
     college: searchList.value.college,
     major: searchList.value.major,
-    classes: searchList.value.classes,
-    studentId: searchList.value.studentId,
-    studentName: searchList.value.studentName,
+    class: searchList.value.class,
+    studentCard: searchList.value.studentCard,
+    name: searchList.value.name,
   });
+console.log(data.data);
 
   if (data.code === 200) {
-    // console.log(data.data);
-    pageList.value.pageData = data.data;
-    pageList.value.pageTotal = data.data.length;
+    pageList.value.tableData = data.data.response;
+    pageList.value.pageTotal = data.data.totalCount;
   }
 };
 
@@ -169,4 +176,4 @@ onMounted(() => {
 /deep/.el-table__body-wrapper .el-table__body tr.el-table__row--striped td {
 	background-color: #f6f7fb;
   }
-</style>
+</style>../../../api/mothod/student

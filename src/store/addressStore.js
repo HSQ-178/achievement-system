@@ -5,28 +5,29 @@ export const useAddressStore = defineStore("address", {
   persist: true,
 
   state: () => ({
-    formateTime: {
-      minutes: 0, //设置时长
-      timeInSeconds: 0, //倒计时
-    },
+    timeInSeconds: 0, //倒计时
   }),
 
   actions: {
-    setFormateTime(formateTime) {
-      this.formateTime = formateTime;
-    },
-
-    updated(formateTime) {
-      for (let i in formateTime) {
-        this.formateTime[i] = formateTime[i];
-      }
+    setTimeInSeconds(timeInSeconds) {
+      this.timeInSeconds = timeInSeconds;
     },
 
     clear() {
-      this.formateTime = {
-        minutes: 0,
-        timeInSeconds: 0,
-      };
+      this.timeInSeconds = 0;
+    },
+
+    //计时器
+    countDownAction() {
+      const timer = setInterval(() => {
+        this.timeInSeconds--;
+
+        if (this.timeInSeconds <= 0) {
+          console.log("清空");
+          this.clear();
+          clearInterval(timer);
+        }
+      }, 1000);
     },
   },
 });

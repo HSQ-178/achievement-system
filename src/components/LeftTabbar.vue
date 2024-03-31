@@ -1,14 +1,14 @@
 <template>
   <div>
     <div>
-      <el-menu :default-active="activeIndex" class="ml-10 w-70 shadow-md" mode="vertical">
+      <el-menu :default-active="activeIndex" class="w-70 h-245 shadow-md" mode="vertical">
         <div class="flex p-4 border border-b">
           <div>
             <img class="w-15 h-15 rounded-full" src="../assets/微信头像.jpg" />
           </div>
           <div class="ml-4 mt-2">
-            <div class="text-4.3">{{ userStore.users.teacherName }}</div>
-            <div class="text-3.5 text-gray-4">{{ userStore.users.teacherId }}</div>
+            <div class="text-4.3">{{ userStore.users.teacher.name }}</div>
+            <div class="text-3.5 text-gray-4">{{ userStore.users.teacher.teacherCard }}</div>
           </div>
         </div>
         <el-menu-item index="1" @click="homePageHandle('1')">
@@ -72,8 +72,8 @@ const teachList = ref([
 const attendanceList = ref([
   { index: "3-1", title: "点名签到", path: "/collSignIn" },
   { index: "3-2", title: "位置签到", path: "/addressSignIn" },
-  { index: "3-3", title: "拍照签到", path: "" },
-  { index: "3-4", title: "二维码签到", path: "" },
+  { index: "3-3", title: "拍照签到", path: "/photoSignIn" },
+  { index: "3-4", title: "二维码签到", path: "/quickResponseCode" },
 ]);
 
 //点击首页，右侧则出现相应页面

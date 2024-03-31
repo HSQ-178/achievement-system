@@ -7,15 +7,9 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ClassAchievementTable: typeof import('./components/ClassAchievementTable.vue')['default']
-    ClassTable: typeof import('./components/ClassTable.vue')['default']
     CourseTable: typeof import('./components/CourseTable.vue')['default']
+    ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
-    ElDialog: typeof import('element-plus/es')['ElDialog']
-    ElDropdown: typeof import('element-plus/es')['ElDropdown']
-    ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
-    ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
@@ -30,9 +24,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     LeftTabbar: typeof import('./components/LeftTabbar.vue')['default']
-    NPagination: typeof import('naive-ui')['NPagination']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    StudentTable: typeof import('./components/StudentTable.vue')['default']
   }
 }

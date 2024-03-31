@@ -2,7 +2,8 @@ import axios from "axios";
 import { useUserStore } from "../store/userStore";
 
 const instance = axios.create({
-    baseURL: "http://localhost:8088",
+    baseURL: "http://localhost:8081/api",
+    // baseURL: "http://192.168.177.77:8088",
     timeout: 20000,
 });
 
@@ -13,7 +14,7 @@ instance.interceptors.request.use(
       const token = userStore.users.token;
   
       if (token != null && token != "") {
-        config.headers.token = token;
+        config.headers.token = token;  //token添加到请求头中
       }
   
       return config;

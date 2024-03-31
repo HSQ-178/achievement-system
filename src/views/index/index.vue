@@ -15,11 +15,11 @@
                     </el-button>
             </div>
         </div>
-        <div class="flex mt-5">
+        <div class="flex">
             <div>
                 <LeftTabbar></LeftTabbar>
             </div>
-            <div class="w-75% ml-10">
+            <div class="w-80% ml-4 mt-5">
                 <router-view></router-view>
             </div>
         </div>
@@ -31,15 +31,15 @@
 import LeftTabbar from '../../components/LeftTabbar.vue';
 import { useUserStore } from '../../store/userStore';
 import router from '../../router/router'
+import { onMounted } from "vue"
 
 const userStore = useUserStore()
 
-
 const loggedInDisplay = computed(() => {
-    return userStore.users.teacherId == '' || userStore.users.teacherName == ''
+    return userStore.users.teacher.teacherCard == '' || userStore.users.teacher.name == ''
 })
 const loggedOutDisplay = computed(() => {
-    return userStore.users.teacherId != '' && userStore.users.teacherName != ''
+    return userStore.users.teacher.teacherCard != '' && userStore.users.teacher.name != ''
 })
 
 //安全退出
@@ -50,6 +50,10 @@ const loggedOff = () => {
         router.push('/login')
     }, 1000);
 }
+
+// onMounted(() => {
+//     console.log(userStore.users);
+// })
 
 </script>
 

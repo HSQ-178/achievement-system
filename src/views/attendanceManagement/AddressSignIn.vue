@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 查询栏 -->
-    <div class="pl-60 h-60 border-2 bg-white hover:shadow-md">
+    <div class="pl-60 h-70 border-2 bg-white hover:shadow-md">
       <el-form class="grid grid-cols-2 p-5">
         <el-form-item label-width="80" label="年级：">
           <el-input
@@ -11,7 +11,7 @@
             placeholder="请输入年级"
           />
         </el-form-item>
-        <el-form-item label="学院：">
+        <el-form-item label-width="80" label="学院：">
           <el-input
             v-model="courseStore.courses.college"
             disabled
@@ -27,7 +27,7 @@
             placeholder="请输入专业"
           />
         </el-form-item>
-        <el-form-item label="课程：">
+        <el-form-item label-width="80" label="课程：">
           <el-input
             v-model="courseStore.courses.course"
             disabled
@@ -42,20 +42,24 @@
           </div>
         </el-form-item>
       </el-form>
-      <div class="absolute left-240 top-60">
+
+      <div class="absolute left-260 top-70">
         <el-button
           @click="releaseClick"
+          :disabled="addressStore.timeInSeconds > 0"
           class="text-white bg-indigo shadow-sm hover:bg-indigo-5 hover:text-white"
         >
           发布签到
-          <div id="countDownTime">({{ timeInSeconds }})</div>
+          <div id="countDownTime" v-if="addressStore.timeInSeconds > 0">
+            ({{ timeInSeconds }})
+          </div>
         </el-button>
       </div>
     </div>
 
     <!-- 签到情况栏 -->
-    <div class="mt-5 border-2 bg-white shadow-sm hover:shadow-md">
-      <div class="w-150 h-100 ml-85" id="echarts"></div>
+    <div class="mt-10 border-2 bg-white shadow-sm hover:shadow-md">
+      <div class="w-150 h-100 ml-115" id="echarts"></div>
     </div>
   </div>
 </template>
@@ -66,9 +70,9 @@ import { useCourseStore } from "../../store/courseStore";
 import { useAddressStore } from "../../store/addressStore";
 import releaseContentApi from "../../api/mothod/ReleaseContent";
 import { formateDate } from "../../utils/formateDate";
-import { findAllInAddress } from "./findCourseAll";
+import { findAllCourse } from "./utils/findCourseAll";
 import * as echarts from "echarts";
-import { ref, onMounted, computed, watchEffect } from "vue";
+import { ref, onMounted, computed, watchEffect, watch } from "vue";
 import { ElMessage } from "element-plus";
 
 const userStore = useUserStore();
@@ -77,43 +81,27 @@ const addressStore = useAddressStore();
 
 //表单时间
 const minutes = ref(1); //设置时长
-const timeInSeconds = ref(minutes.value * 60); //将时长换算成秒
-
+const timeInSeconds = computed(() => {
+  return addressStore.timeInSeconds > 0 ? addressStore.timeInSeconds : minutes.value * 60;
+}); //将时长换算成秒
 
 //发布签到
 const releaseClick = async () => {
-  const currentTime = new Date(); //获取当前时间
-  currentTime.setMinutes(currentTime.getMinutes() + minutes.value); //将设置的时长加到当前时间里面
-  const formattedDateTime = currentTime.toISOString(); //后端要求的日期格式日期格式是 “yyyy-MM-dd’T’HH:mm:ss”
-
   const { data } = await releaseContentApi.saveReleaseContent({
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
     course: courseStore.courses.course,
-    endTime: formattedDateTime,
-    teacherId: userStore.users.teacherId,
+    duration: minutes.value,
+    teacherId: userStore.users.teacherId
   });
-  // console.log(data.data);
   if (data.code === 200) {
-    ElMessage.info("发布成功!");
-
-    //计时器
-    const countDownTime = document.getElementById('countDownTime');
-      let interval = setInterval(() => {
-        timeInSeconds.value--;
-        addressStore.setFormateTime({
-          minutes: minutes.value,
-          timeInSeconds: timeInSeconds.value
-        })
-        countDownTime.innerText = `(${timeInSeconds.value})`;
-        if (timeInSeconds.value === 0) {
-          countDownTime.style.display = "none";
-          clearInterval(interval);
-        }
-      }, 1000);
+    ElMessage.success("发布成功!");
+    
+    addressStore.setTimeInSeconds(timeInSeconds.value);
+    addressStore.countDownAction();
   } else {
-    ElMessage.info("发布失败！");
+    ElMessage.error(data.msg);
   }
 };
 
@@ -256,8 +244,8 @@ watchEffect(() => {
   drawPie(data.value.values);
 });
 
-onMounted(() => {
-  findAllInAddress();
+onMounted(async () => {
+  findAllCourse();
   drawPie();
   attendanceConditions();
   refresh();

@@ -1,5 +1,7 @@
 import { createApp } from 'vue'
 import './style.css'
+//element plus css样式
+import 'element-plus/dist/index.css'
 import App from './App.vue'
 
 //路由
@@ -14,6 +16,5 @@ pinia.use(piniaPluginPersistedstate)
 //unocss
 import "@unocss/reset/tailwind.css"
 import "uno.css" 
-
 
 createApp(App).use(pinia).use(router).mount('#app')

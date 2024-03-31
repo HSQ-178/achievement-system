@@ -33,9 +33,9 @@
           <el-table-column prop="grade" sortable label="年级" align="center" />
           <el-table-column prop="college" label="学院" align="center" />
           <el-table-column prop="major" label="专业" align="center" />
-          <el-table-column prop="classes" sortable label="班级" align="center" />
-          <el-table-column prop="studentId" sortable label="学号" align="center" />
-          <el-table-column prop="studentName" label="姓名" align="center" />
+          <el-table-column prop="class" sortable label="班级" align="center" />
+          <el-table-column prop="studentCard" sortable label="学号" align="center" />
+          <el-table-column prop="name" label="姓名" align="center" />
           <el-table-column label="操作" align="center">
             <template #default="scope">
               <!-- 未签到 -->
@@ -114,36 +114,41 @@
 
 <script setup>
 import attendanceManagementApi from "../../api/mothod/AttendanceManagement";
+import recordApi from "../../api/mothod/record";
 import { Check, Close, Warning } from "@element-plus/icons-vue";
 import { useUserStore } from "../../store/userStore";
+import { useCourseStore } from "../../store/courseStore";
 import formateTime from "../../utils/formateTime";
 import {formateDate} from "../../utils/formateDate";
 import { pageList, handleSizeChange, handleCurrentChange } from '../../utils/pagination'
-import { tableData, findAllInCollSignIn } from './findCourseAll'
+import { findAllCourse } from './utils/findCourseAll'
 import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
 
 const userStore = useUserStore();
+const courseStore = useCourseStore()
 
-const tableList = ref([]); //表格切换数据
 const name = ref(""); //按钮切换显示不同的按钮
 
 //未签到
 const notSignInChange = async () => {
-  const { data } = await attendanceManagementApi.findNotSignInBYConditions({
-    teacherId: userStore.users.teacherId,
-    grade: tableData.value.grade,
-    college: tableData.value.college,
-    major: tableData.value.major,
-    course: tableData.value.course,
+  const { data } = await recordApi.getNotSignInStudentList({
+    teacherCard: userStore.users.teacher.teacherCard,
+    grade: courseStore.courses.grade,
+    college: courseStore.courses.college,
+    major: courseStore.courses.major,
+    courseId: courseStore.courses.id,
+    class: courseStore.courses.class,
     createTime: formateDate(new Date()),
-    currentPage: pageList.value.currentPage,
-    pageSize: pageList.value.pageSize
+    pagination: {
+      page: pageList.value.currentPage,
+      pageSize: pageList.value.pageSize
+    },
+    status: 1
   });
-  // console.log(data.data.data);
+  console.log(data.data);
   if (data.code === 200) {
-    tableList.value = data.data.data;
-    pageList.value.tableData = data.data.data;
+    pageList.value.tableData = data.data.studentList;
     pageList.value.pageTotal = data.data.totalCount;
   }
   name.value = "notSignIn";
@@ -151,23 +156,25 @@ const notSignInChange = async () => {
 
 //签到
 const signInChange = async() => {
-  const { data } = await attendanceManagementApi.findSignInOrAbsenceByConditions({
-    teacherId: userStore.users.teacherId,
-    grade: tableData.value.grade,
-    college: tableData.value.college,
-    major: tableData.value.major,
-    course: tableData.value.course,
+  const { data } = await recordApi.getSignInAndAbsenceList({
+    teacherCard: userStore.users.teacherCard,
+    grade: courseStore.courses.grade,
+    college: courseStore.courses.college,
+    major: courseStore.courses.major,
+    courseId: courseStore.courses.id,
+    class: courseStore.courses.class,
     createTime: formateDate(new Date()),
-    state: 1,
-    currentPage: pageList.value.currentPage,
-    pageSize: pageList.value.pageSize
+    pagination: {
+      page: pageList.value.currentPage,
+      pageSize: pageList.value.pageSize
+    },
+    status: 1
   });
   console.log(data.data);
 
   if (data.code === 200) {
-    tableList.value = data.data.data;
-    pageList.value.tableData = data.data.data;
-    pageList.value.pageTotal = data.data.data.length;
+    pageList.value.tableData = data.data.recordResp;
+    pageList.value.pageTotal = data.data.totalCount;
 
   }
   name.value = "signIn";
@@ -175,23 +182,25 @@ const signInChange = async() => {
 
 //缺勤
 const absenceChange = async () => {
-  const { data } = await attendanceManagementApi.findSignInOrAbsenceByConditions({
-    teacherId: userStore.users.teacherId,
-    grade: tableData.value.grade,
-    college: tableData.value.college,
-    major: tableData.value.major,
-    course: tableData.value.course,
+  const { data } = await recordApi.getSignInAndAbsenceList({
+    teacherCard: userStore.users.teacherCard,
+    grade: courseStore.courses.grade,
+    college: courseStore.courses.college,
+    major: courseStore.courses.major,
+    courseId: courseStore.courses.id,
+    class: courseStore.courses.class,
     createTime: formateDate(new Date()),
-    state: 0,
-    currentPage: pageList.value.currentPage,
-    pageSize: pageList.value.pageSize
+    status: 0,
+    pagination: {
+      page: pageList.value.currentPage,
+      pageSize: pageList.value.pageSize
+    },
   });
   // console.log(data.data);
 
   if (data.code === 200) {
-    tableList.value = data.data.data;
-    pageList.value.tableData = data.data.data;
-    pageList.value.pageTotal = data.data.data.length;
+    pageList.value.tableData = data.data.recordResp;
+    pageList.value.pageTotal = data.data.totalCount;
 
   }
   name.value = "absence";
@@ -344,18 +353,8 @@ const changeCurrentPage = (val) => {
   notSignInChange()
 };
 
-//侦听
-watch(
-  () => tableData.value,
-  (newCourseList) => {
-    notSignInChange(newCourseList),
-      signInChange(newCourseList),
-      absenceChange(newCourseList);
-  }
-);
-
 onMounted(() => {
   //获取所有课程
-  findAllInCollSignIn();
+  findAllCourse();
 });
 </script>

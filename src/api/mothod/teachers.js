@@ -17,11 +17,11 @@ export default {
     },
 
     //登录
-    login: (teachers) => {
+    login: (teacher) => {
         return axios({
             method: "POST",
             url: `${baseURL}/login`,
-            data: teachers
+            data: teacher
         })
     }
 }
