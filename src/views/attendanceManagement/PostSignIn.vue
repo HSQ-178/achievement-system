@@ -68,7 +68,7 @@
 import { useUserStore } from "../../store/userStore";
 import { useCourseStore } from "../../store/courseStore";
 import { useAddressStore } from "../../store/addressStore";
-import releaseContentApi from "../../api/mothod/ReleaseContent";
+import noticeApi from "../../api/mothod/notice";
 import { formateDate } from "../../utils/formateDate";
 import { findAllCourse } from "./utils/findCourseAll";
 import * as echarts from "echarts";
@@ -87,13 +87,13 @@ const timeInSeconds = computed(() => {
 
 //发布签到
 const releaseClick = async () => {
-  const { data } = await releaseContentApi.saveReleaseContent({
+  const { data } = await noticeApi.setRedis({
     grade: courseStore.courses.grade,
-    college: courseStore.courses.college,
     major: courseStore.courses.major,
-    course: courseStore.courses.course,
+    college: courseStore.courses.college,
+    courseId: courseStore.courses.id,
     duration: minutes.value,
-    teacherId: userStore.users.teacherId
+    teacherCard: userStore.users.teacher.teacherCard
   });
   if (data.code === 200) {
     ElMessage.success("发布成功!");
@@ -115,44 +115,50 @@ const attendanceCount = ref({
 //获取考勤各情况信息
 const attendanceConditions = async () => {
   //未签到情况
-  const notSignIn = await releaseContentApi.findNotSignInBYConditions({
-    teacherId: userStore.users.teacherId,
+  const notSignIn = await noticeApi.getNotSignInStudentList({
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
-    course: courseStore.courses.course,
+    class: courseStore.courses.class,
+    courseId: courseStore.courses.id,
     createTime: formateDate(new Date()),
+    status: 1
   });
-  // console.log(notSignIn.data.data);
+  // console.log(notSignIn.data.data.studentList);
   if (notSignIn.data.code === 200) {
-    attendanceCount.value.notSignInCount = notSignIn.data.data.length;
+    attendanceCount.value.notSignInCount = notSignIn.data.data.studentList.length;
   }
   //签到情况
-  const signIn = await releaseContentApi.findSignInOrAbsenceByConditions({
-    teacherId: userStore.users.teacherId,
+  const signIn = await noticeApi.getSignInAndAbsenceList({
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
-    course: courseStore.courses.course,
+    class: courseStore.courses.class,
+    courseId: courseStore.courses.id,
     createTime: formateDate(new Date()),
-    state: 1,
+    status: 1,
   });
+  console.log(signIn.data.data.recordResp);
   if (signIn.data.code === 200) {
-    attendanceCount.value.signInCount = signIn.data.data.length;
+    attendanceCount.value.signInCount = signIn.data.data.totalCount;
   }
 
   //缺勤情况
-  const absence = await releaseContentApi.findSignInOrAbsenceByConditions({
-    teacherId: userStore.users.teacherId,
+  const absence = await noticeApi.getSignInAndAbsenceList({
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
-    course: courseStore.courses.course,
+    class: courseStore.courses.class,
+    courseId: courseStore.courses.id,
     createTime: formateDate(new Date()),
-    state: 0,
+    status: 2,
   });
+  console.log(signIn.data.data.recordResp);
   if (absence.data.code === 200) {
-    attendanceCount.value.absenceCount = absence.data.data.length;
+    attendanceCount.value.absenceCount = absence.data.data.totalCount;
   }
 };
 

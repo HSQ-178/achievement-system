@@ -98,19 +98,20 @@ const timeInSeconds = computed(() => {
 
 //发布
 const releaseClick = async () => {
-  const { data } = await qrcodeApi.qrcodeSave({
-    teacherId: userStore.users.teacherId,
+  const { data } = await qrcodeApi.setQrcode({
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: courseStore.courses.grade,
+    college: courseStore.courses.college,
     major: courseStore.courses.major,
-    course: courseStore.courses.course,
-    qrcodeDuration: formData.value.qrcodeDuration,
-    qrcodeFrequency: formData.value.qrcodeFrequency,
+    courseId: courseStore.courses.id,
+    qrcodeDuration: formData.value.qrcodeDuration,   //二维码有效时长
+    qrcodeFrequency: formData.value.qrcodeFrequency,  //二维码刷新频率
   });
-  // console.log(data.data.qrId);
+  console.log(data);
   if (data.code === 200) {
     ElMessage.success("发布成功!");
 
-    qrcodeId.value = data.data.qrId
+    // qrcodeId.value = data.data.qrId
     qrcodeStore.setQrcode(qrcodeId.value, timeInSeconds.value, formData.value.qrcodeFrequency);
     qrcodeStore.qrcodeCountDownAction();
   } else {

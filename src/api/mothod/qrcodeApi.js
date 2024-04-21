@@ -4,25 +4,20 @@ const baseURL = "/qrcode"
 
 export default {
     //保存二维码信息
-    qrcodeSave: (data) => {
+    setQrcode: (data) => {
         return axios({
             method: "POST",
-            url: `${baseURL}/qrcodeSave`,
+            url: `${baseURL}/setQrcode`,
             data: data
         })
     },
 
     //显示二维码
-    toQrcode: (qrcodeData) => {
+    getQrcode: (qrcodeData) => {
         return axios({
             method: "GET",
-            url: `${baseURL}/toQrcode`,
-            data: {
-                teacherId: qrcodeData.teacherId,
-                major: qrcodeData.major,
-                course: qrcodeData.course,
-                qrcodeCreateTime: qrcodeData.qrcodeCreateTime
-            }
+            url: `${baseURL}/getQrcode`,
+            data: qrcodeData
         })
     }
 }

@@ -4,9 +4,9 @@ import HomePage from "../views/homePage/HomePage.vue";
 import StudentManagement from "../views/teachAchievement/student/StudentManagement.vue";
 import CourseManagement from "../views/teachAchievement/course/CourseManagement.vue";
 import CollSignIn from "../views/attendanceManagement/CollSignIn.vue";
-import AddressSignIn from "../views/attendanceManagement/AddressSignIn.vue";
-import PhotoSignIn from '../views/attendanceManagement/PhotoSignIn.vue'
-import QuickResponseCode from '../views/attendanceManagement/QuickResponseCode.vue'
+import PostSignIn from "../views/attendanceManagement/PostSignIn.vue"
+import SignInCode from '../views/attendanceManagement/SignInCode.vue'
+import QrCode from '../views/attendanceManagement/qrCode.vue'
 import Register from "../views/registerAndLogin/Register.vue";
 import Login from "../views/registerAndLogin/Login.vue";
 import ToQrcodeView from "../views/attendanceManagement/components/ToQrcodeView.vue";
@@ -25,9 +25,9 @@ const router = createRouter({
         { path: "/studentManagement", component: StudentManagement },
         { path: "/courseManagement", component: CourseManagement },
         { path: "/collSignIn", component: CollSignIn },
-        { path: "/addressSignIn", component: AddressSignIn},
-        { path: "/photoSignIn", component: PhotoSignIn },
-        { path: "/quickResponseCode", component: QuickResponseCode}
+        { path: "/postSignIn", component: PostSignIn},
+        { path: "/signInCode", component: SignInCode },
+        { path: "/qrCode", component: QrCode}
       ],
       meta: {
         needToken: true, //给路由加一个变量，用于判断是否需要登录

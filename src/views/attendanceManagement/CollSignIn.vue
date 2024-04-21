@@ -113,7 +113,6 @@
 </template>
 
 <script setup>
-import attendanceManagementApi from "../../api/mothod/AttendanceManagement";
 import recordApi from "../../api/mothod/record";
 import { Check, Close, Warning } from "@element-plus/icons-vue";
 import { useUserStore } from "../../store/userStore";
@@ -157,7 +156,7 @@ const notSignInChange = async () => {
 //签到
 const signInChange = async() => {
   const { data } = await recordApi.getSignInAndAbsenceList({
-    teacherCard: userStore.users.teacherCard,
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
@@ -183,20 +182,20 @@ const signInChange = async() => {
 //缺勤
 const absenceChange = async () => {
   const { data } = await recordApi.getSignInAndAbsenceList({
-    teacherCard: userStore.users.teacherCard,
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: courseStore.courses.grade,
     college: courseStore.courses.college,
     major: courseStore.courses.major,
     courseId: courseStore.courses.id,
     class: courseStore.courses.class,
     createTime: formateDate(new Date()),
-    status: 0,
     pagination: {
       page: pageList.value.currentPage,
       pageSize: pageList.value.pageSize
     },
+    status: 2
   });
-  // console.log(data.data);
+  console.log(data.data);
 
   if (data.code === 200) {
     pageList.value.tableData = data.data.recordResp;
@@ -210,21 +209,21 @@ const absenceChange = async () => {
 const notSinInToSignIn = async (row) => {
   //当前日期与上课时间进行拼接
   const date = new Date(
-    formateDate(new Date()) + " " + formateTime(new Date(tableData.value.startTime))
+    formateDate(new Date()) + " " + formateTime(new Date(courseStore.courses.startTime))
   ).toISOString();
   
 
-  const { data } = await attendanceManagementApi.notSinInToSignInSave({
-    teacherId: userStore.users.teacherId,
+  const { data } = await recordApi.addRecords({
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: tableData.value.course,
-    classes: row.classes,
-    studentId: row.studentId,
-    studentName: row.studentName,
+    courseId: courseStore.courses.id,
+    class: row.class,
+    studentCard: row.studentCard,
+    name: row.name,
     createTime: date,
-    state: 1,
+    status: 1,
   });
 
   if (data.code === 200) {
@@ -240,21 +239,21 @@ const notSinInToSignIn = async (row) => {
 const notSignInToAbsence = async (row) => {
   //当前日期与上课时间进行拼接
   const date = new Date(
-    formateDate(new Date()) + " " + formateTime(new Date(tableData.value.startTime))
+    formateDate(new Date()) + " " + formateTime(new Date(courseStore.courses.startTime))
   ).toISOString();
   // console.log(date);
 
-  const { data } = await attendanceManagementApi.notSinInToSignInSave({
-    teacherId: userStore.users.teacherId,
+  const { data } = await recordApi.addRecords({
+    teacherCard: userStore.users.teacher.teacherCard,
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: tableData.value.course,
-    classes: row.classes,
-    studentId: row.studentId,
-    studentName: row.studentName,
+    courseId: courseStore.courses.id,
+    class: row.class,
+    studentCard: row.studentCard,
+    name: row.name,
     createTime: date,
-    state: 0,
+    status: 2,
   });
 
   if (data.code === 200) {
@@ -268,18 +267,18 @@ const notSignInToAbsence = async (row) => {
 
 //签到 => 未签到
 const signInToNotSignIn = async (row) => {
-  const { data } = await attendanceManagementApi.deleteSignInToNotSignInByConditions({
+  const { data } = await recordApi.deleteRecords({
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: tableData.value.course,
-    classes: row.classes,
-    studentId: row.studentId,
-    studentName: row.studentName,
-    createTime: formateDate(new Date()),
-    state: row.state,
+    courseId: courseStore.courses.id,
+    class: row.class,
+    studentCard: row.studentCard,
+    name: row.name,
+    createTime: new Date(),
+    status: row.status,
   });
-
+  console.log(data.data);
     const index = pageList.value.tableData.indexOf(row);
     if (index > -1) {
       pageList.value.tableData.splice(index, 1);
@@ -290,11 +289,9 @@ const signInToNotSignIn = async (row) => {
 //签到 => 缺勤
 const signInToAbsence = async (row) => {
   console.log(row);
-  const { data } = await attendanceManagementApi.updateStateByConditions({
-    state: 0,
-    grade: row.grade,
+  const { data } = await recordApi.updateRecords({
     id: row.id,
-    createTime: formateDate(new Date()),
+    status: 2
   });
 
     const index = pageList.value.tableData.indexOf(row);
@@ -307,34 +304,33 @@ const signInToAbsence = async (row) => {
 
 //缺勤 => 签到
 const absenceToSignIn = async (row) => {
-  const { data } = await attendanceManagementApi.updateStateByConditions({
-    state: 1,
-    id: row.id,
-    createTime: formateDate(new Date()),
+  const { data } = await recordApi.updateRecords({
+    status: 1,
+    id: row.id
   });
 
     const index = pageList.value.tableData.indexOf(row);
 
     if (index > -1) {
       pageList.value.tableData = pageList.value.tableData.filter((item) => item !== row);
-      ElMessage.info("该同学缺勤！");
+      ElMessage.info("该同学已签到！");
     }
 };
 
 //缺勤 => 未签到
 const absenceToNotSignIn = async (row) => {
-  const { data } = await attendanceManagementApi.deleteSignInToNotSignInByConditions({
+  const { data } = await recordApi.deleteRecords({
     grade: row.grade,
     college: row.college,
     major: row.major,
-    course: tableData.value.course,
-    classes: row.classes,
-    studentId: row.studentId,
-    studentName: row.studentName,
-    createTime: formateDate(new Date()),
-    state: row.state,
+    courseId: courseStore.courses.id,
+    class: row.class,
+    studentCard: row.studentCard,
+    name: row.name,
+    createTime: new Date(),
+    status: row.status,
   });
-
+  console.log(data.data);
     const index = pageList.value.tableData.indexOf(row);
 
     if (index > -1) {

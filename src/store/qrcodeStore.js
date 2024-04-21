@@ -8,6 +8,7 @@ export const useqrcodeStore = defineStore("qrcode", {
     qrcodeId: "",
     qrcodeDuration: 0, //二维码有效时长
     frequency: 0, //二维码刷新频率
+    expiration: 0 //二维码过期时间
   }),
 
   actions: {
