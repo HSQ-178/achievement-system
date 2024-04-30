@@ -76,6 +76,7 @@ import { useCourseStore } from "../../store/courseStore";
 import { useqrcodeStore } from "../../store/qrcodeStore";
 import { useUserStore } from "../../store/userStore";
 import { findAllCourse } from "./utils/findCourseAll";
+import { formateDateTime } from '../../utils/formateDate';
 import qrcodeApi from "../../api/mothod/qrcodeApi";
 import { ref, onMounted, computed } from "vue";
 import router from "../../router/router";
@@ -99,20 +100,23 @@ const timeInSeconds = computed(() => {
 //发布
 const releaseClick = async () => {
   const { data } = await qrcodeApi.setQrcode({
-    teacherCard: userStore.users.teacher.teacherCard,
-    grade: courseStore.courses.grade,
-    college: courseStore.courses.college,
-    major: courseStore.courses.major,
-    courseId: courseStore.courses.id,
+    id: userStore.users.teacher.teacherCard,
+    content: JSON.stringify({
+      teacherCard: userStore.users.teacher.teacherCard,
+      grade: courseStore.courses.grade,
+      college: courseStore.courses.college,
+      major: courseStore.courses.major,
+      courseId: courseStore.courses.id
+    }),
     qrcodeDuration: formData.value.qrcodeDuration,   //二维码有效时长
     qrcodeFrequency: formData.value.qrcodeFrequency,  //二维码刷新频率
   });
   console.log(data);
   if (data.code === 200) {
     ElMessage.success("发布成功!");
-
-    // qrcodeId.value = data.data.qrId
-    qrcodeStore.setQrcode(qrcodeId.value, timeInSeconds.value, formData.value.qrcodeFrequency);
+    
+    const expirationTime = formateDateTime(new Date(data.data));
+    qrcodeStore.setQrcode(qrcodeId.value, timeInSeconds.value, formData.value.qrcodeFrequency, expirationTime);
     qrcodeStore.qrcodeCountDownAction();
   } else {
     ElMessage.error(data.msg);

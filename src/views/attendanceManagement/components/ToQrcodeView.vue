@@ -25,17 +25,17 @@ const baseURL = "http://localhost:8082/api/qrcode";
 const imageURL = ref(`${baseURL}/getQrcode?teacherCard=${userStore.users.teacher.teacherCard}`);
 
 onMounted(() => {
-  //获取当前时间戳
-  const currentTime = new Date().getTime()
-
   const timer = setInterval(() => {
     if (
-      new Date(currentTime) > new Date(currentTime + (qrcodeStore.qrcodeDuration * 60 * 1000))
+      new Date().getTime() < new Date(qrcodeStore.expiration).getTime()
     ) {
-      clearInterval(timer);
-      ElMessage.Info("签到时间已结束!")
-      router.back()
-    }
-  }, 100)
+      imageURL.value = `${baseURL}/getQrcode?teacherCard=${userStore.users.teacher.teacherCard}`;
+    } 
+    // else {
+    //   clearInterval(timer);
+    //   ElMessage.error("二维码已过期");
+    //   router.back();
+    // }
+  }, 1000)
 });
 </script>

@@ -8,14 +8,15 @@ export const useqrcodeStore = defineStore("qrcode", {
     qrcodeId: "",
     qrcodeDuration: 0, //二维码有效时长
     frequency: 0, //二维码刷新频率
-    expiration: 0 //二维码过期时间
+    expiration: "" //二维码过期时间
   }),
 
   actions: {
-    setQrcode(qrcodeId, qrcodeDuration, frequency) {
+    setQrcode(qrcodeId, qrcodeDuration, frequency, expiration) {
       this.qrcodeId = qrcodeId
       this.qrcodeDuration = qrcodeDuration;
       this.frequency = frequency
+      this.expiration = expiration
     },
 
     // updated(qrcodeData) {
@@ -28,6 +29,7 @@ export const useqrcodeStore = defineStore("qrcode", {
       this.qrcodeId = "",
       this.qrcodeDuration = 0,
       this.frequency = 0
+      this.expiration = ""
     },
 
     //计时器
