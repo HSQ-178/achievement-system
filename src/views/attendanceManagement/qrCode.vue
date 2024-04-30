@@ -37,13 +37,21 @@
         </el-form-item>
         <el-form-item label="二维码时长：">
           <div class="h-10 flex">
-            <el-input-number v-model="formData.qrcodeDuration" :min="1" :max="10" />
+            <el-input-number
+              v-model="formData.qrcodeDuration"
+              :min="1"
+              :max="10"
+            />
             <p class="ml-2 mt-1 text-4 text-gray-6">分钟</p>
           </div>
         </el-form-item>
         <el-form-item label="二维码刷新频率：">
           <div class="h-10 flex">
-            <el-input-number v-model="formData.qrcodeFrequency" :min="5" :max="60" />
+            <el-input-number
+              v-model="formData.qrcodeFrequency"
+              :min="5"
+              :max="60"
+            />
             <p class="ml-2 mt-1 text-4 text-gray-6">秒/次</p>
           </div>
         </el-form-item>
@@ -76,7 +84,7 @@ import { useCourseStore } from "../../store/courseStore";
 import { useqrcodeStore } from "../../store/qrcodeStore";
 import { useUserStore } from "../../store/userStore";
 import { findAllCourse } from "./utils/findCourseAll";
-import { formateDateTime } from '../../utils/formateDate';
+import { formateDateTime } from "../../utils/formateDate";
 import qrcodeApi from "../../api/mothod/qrcodeApi";
 import { ref, onMounted, computed } from "vue";
 import router from "../../router/router";
@@ -89,7 +97,7 @@ const formData = ref({
   qrcodeDuration: 1, //二维码有效时间
   qrcodeFrequency: 5, //二维码刷新频率
 });
-const qrcodeId = ref("")
+const qrcodeId = ref("");
 
 const timeInSeconds = computed(() => {
   return qrcodeStore.qrcodeDuration > 0
@@ -106,17 +114,24 @@ const releaseClick = async () => {
       grade: courseStore.courses.grade,
       college: courseStore.courses.college,
       major: courseStore.courses.major,
-      courseId: courseStore.courses.id
+      courseId: courseStore.courses.id,
     }),
-    qrcodeDuration: formData.value.qrcodeDuration,   //二维码有效时长
-    qrcodeFrequency: formData.value.qrcodeFrequency,  //二维码刷新频率
+    qrcodeDuration: formData.value.qrcodeDuration, //二维码有效时长
+    qrcodeFrequency: formData.value.qrcodeFrequency, //二维码刷新频率
   });
   console.log(data);
   if (data.code === 200) {
     ElMessage.success("发布成功!");
-    
+
     const expirationTime = formateDateTime(new Date(data.data));
-    qrcodeStore.setQrcode(qrcodeId.value, timeInSeconds.value, formData.value.qrcodeFrequency, expirationTime);
+    qrcodeStore.setQrcode(
+      qrcodeId.value,
+      timeInSeconds.value,
+      formData.value.qrcodeFrequency,
+      expirationTime
+    );
+
+    console.log(expirationTime);
     qrcodeStore.qrcodeCountDownAction();
   } else {
     ElMessage.error(data.msg);
@@ -125,7 +140,7 @@ const releaseClick = async () => {
 
 //查看二维码
 const ToQrcodeView = () => {
-    router.push("/toQrcodeView")
+  router.push("/toQrcodeView");
 };
 
 onMounted(async () => {

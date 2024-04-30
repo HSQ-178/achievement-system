@@ -1,15 +1,10 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useAddressStore } from './store/addressStore';
-import { useqrcodeStore } from './store/qrcodeStore';
+import { onMounted } from "vue";
+import { useAddressStore } from "./store/addressStore";
+import { useqrcodeStore } from "./store/qrcodeStore";
 
-const addressStore = useAddressStore()
-const qrcodeStore = useqrcodeStore()
-
-onMounted(() => {
-  addressStore.timeInSeconds > 0 && addressStore.countDownAction()
-  qrcodeStore.qrcodeDuration > 0 && qrcodeStore.qrcodeCountDownAction()
-})
+const addressStore = useAddressStore();
+const qrcodeStore = useqrcodeStore();
 </script>
 
 <template>
@@ -18,6 +13,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
