@@ -24,6 +24,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     LeftTabbar: typeof import('./components/LeftTabbar.vue')['default']
+    NModal: typeof import('naive-ui')['NModal']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

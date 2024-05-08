@@ -5,7 +5,7 @@ import StudentManagement from "../views/teachAchievement/student/StudentManageme
 import CourseManagement from "../views/teachAchievement/course/CourseManagement.vue";
 import CollSignIn from "../views/attendanceManagement/CollSignIn.vue";
 import PostSignIn from "../views/attendanceManagement/PostSignIn.vue"
-import SignInCode from '../views/attendanceManagement/SignInCode.vue'
+import Authcode from '../views/attendanceManagement/Authcode.vue'
 import QrCode from '../views/attendanceManagement/qrCode.vue'
 import Register from "../views/registerAndLogin/Register.vue";
 import Login from "../views/registerAndLogin/Login.vue";
@@ -26,7 +26,7 @@ const router = createRouter({
         { path: "/courseManagement", component: CourseManagement },
         { path: "/collSignIn", component: CollSignIn },
         { path: "/postSignIn", component: PostSignIn},
-        { path: "/signInCode", component: SignInCode },
+        { path: "/authcode", component: Authcode },
         { path: "/qrCode", component: QrCode}
       ],
       meta: {

@@ -60,11 +60,11 @@
       <div class="absolute left-230 top-70">
         <el-button
           @click="releaseClick"
-          :disabled="qrcodeStore.qrcodeDuration > 0"
+          :disabled="qrcodeStore.expiration > formateDateTime(new Date())"
           class="mr-10 text-white bg-indigo shadow-sm hover:bg-indigo-5 hover:text-white"
         >
           发布签到
-          <div id="countDownTime" v-if="qrcodeStore.qrcodeDuration > 0">
+          <div id="countDownTime" v-if="qrcodeStore.expiration > formateDateTime(new Date())">
             ({{ timeInSeconds }})
           </div>
         </el-button>
@@ -100,7 +100,7 @@ const formData = ref({
 const qrcodeId = ref("");
 
 const timeInSeconds = computed(() => {
-  return qrcodeStore.qrcodeDuration > 0
+  return qrcodeStore.expiration > formateDateTime(new Date())
     ? qrcodeStore.qrcodeDuration
     : formData.value.qrcodeDuration * 60;
 }); //将时长换算成秒

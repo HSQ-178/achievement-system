@@ -72,7 +72,7 @@ const teachList = ref([
 const attendanceList = ref([
   { index: "3-1", title: "点名签到", path: "/collSignIn" },
   { index: "3-2", title: "发布签到", path: "/postSignIn" },
-  { index: "3-3", title: "签到码签到", path: "/signInCode" },
+  { index: "3-3", title: "签到码签到", path: "/authcode" },
   { index: "3-4", title: "二维码签到", path: "/qrCode" },
 ]);
 

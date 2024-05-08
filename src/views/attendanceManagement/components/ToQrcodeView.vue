@@ -30,12 +30,11 @@ onMounted(() => {
       new Date().getTime() < new Date(qrcodeStore.expiration).getTime()
     ) {
       imageURL.value = `${baseURL}/getQrcode?teacherCard=${userStore.users.teacher.teacherCard}`;
-    } 
-    // else {
-    //   clearInterval(timer);
-    //   ElMessage.error("二维码已过期");
-    //   router.back();
-    // }
+    } else {
+      clearInterval(timer);
+      ElMessage.error("二维码已过期");
+      router.back();
+    }
   }, 1000)
 });
 </script>
