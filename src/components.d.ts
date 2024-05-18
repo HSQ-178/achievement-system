@@ -29,6 +29,7 @@ declare module 'vue' {
     ElTextarea: typeof import('element-plus/es')['ElTextarea']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     LeftTabbar: typeof import('./components/LeftTabbar.vue')['default']
+    NModal: typeof import('naive-ui')['NModal']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
