@@ -1,14 +1,20 @@
 <template>
   <div>
     <div>
-      <el-menu :default-active="activeIndex" class="w-70 h-245 shadow-md" mode="vertical">
+      <el-menu
+        :default-active="activeIndex"
+        class="w-70 h-245 shadow-md"
+        mode="vertical"
+      >
         <div class="flex p-4 border border-b">
           <div>
             <img class="w-15 h-15 rounded-full" src="../assets/微信头像.jpg" />
           </div>
           <div class="ml-4 mt-2">
             <div class="text-4.3">{{ userStore.users.teacher.name }}</div>
-            <div class="text-3.5 text-gray-4">{{ userStore.users.teacher.teacherCard }}</div>
+            <div class="text-3.5 text-gray-4">
+              {{ userStore.users.teacher.teacherCard }}
+            </div>
           </div>
         </div>
         <el-menu-item index="1" @click="homePageHandle('1')">
@@ -43,7 +49,7 @@
             {{ item.title }}
           </el-menu-item>
         </el-sub-menu>
-        <el-menu-item index="4">
+        <el-menu-item index="4" @click="$router.push('/homework')">
           <el-icon><Memo /></el-icon>
           作业管理
         </el-menu-item>
